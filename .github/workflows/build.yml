@@ -2,6 +2,8 @@ name: Build Caddy with Cloudflare DNS
 
 on:
   push:
+    branches:
+      - 'master'
     tags:
       - 'v*'
 
@@ -18,6 +20,7 @@ jobs:
           images: ghcr.io/emberquill/caddy
           flavor: latest=true
           tags: |
+            type=ref,event=branch
             type=semver,pattern={{version}}
 
       - name: Login to image repository
