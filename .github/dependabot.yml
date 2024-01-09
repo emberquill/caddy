@@ -4,7 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    reviewers:
+      - emberquill
   - package-ecosystem: docker
     directory: "/"
     schedule:
       interval: daily
+    reviewers:
+      - emberquill

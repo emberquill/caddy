@@ -1,0 +1,21 @@
+name: Tag merge commit
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  bump-version-tag:
+    if: github.event.pull_request.merged = true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Version and Tag Merge Commit
+        run: |
+          VERSION=$(grep -E "\d+\.\d+\.\d+" Dockerfile)
+          git tag -a "v${VERSION}"
+          git push --tags
+          echo $VERSION
