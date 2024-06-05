@@ -9,13 +9,21 @@ on:
 
 jobs:
   bump-version-tag:
-    if: github.event.pull_request.merged = true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Get Version and Tag Merge Commit
+      - name: Get Version from Dockerfile
+        id: getversion
         run: |
-          VERSION=$(grep -E "\d+\.\d+\.\d+" Dockerfile)
-          git tag -a "v${VERSION}"
-          git push --tags
-          echo $VERSION
+          VERSION="v$(awk -F'[:-]' 'NR==1{print $2}' Dockerfile)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Create Tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.getversion.outputs.version }}'
+            })
