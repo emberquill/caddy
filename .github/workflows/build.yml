@@ -1,13 +1,37 @@
 name: Build Caddy with Cloudflare DNS
 
 on:
-  push:
-    tags:
-      - 'v*'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
 
 jobs:
+  bump-version-tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Version from Dockerfile
+        id: getversion
+        run: |
+          VERSION="v$(awk -F'[:-]' 'NR==1{print $2}' Dockerfile)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Create Tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.getversion.outputs.version }}',
+              sha: context.sha
+            })
+
   build-caddy-with-cloudflare:
     runs-on: ubuntu-latest
+    needs: bump-version-tag
     steps:
       - uses: actions/checkout@v4
 
