@@ -34,6 +34,9 @@ jobs:
     needs: bump-version-tag
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Docker meta
         id: meta
